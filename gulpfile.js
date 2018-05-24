@@ -20,6 +20,8 @@ const gulp = require('gulp');
 const rename = require('gulp-rename');
 const initWcBuild = require('byu-web-component-build').gulp;
 
+const sass = require('gulp-sass');
+
 gulp.task('build', ['wc:build', 'temp:copy-files'], function() {
     browserSync.reload();
 });
@@ -40,6 +42,13 @@ initWcBuild(gulp, {
  * NOTE: This breaks sourcemaps support.
  */
 gulp.task('temp:copy-files', ['wc:build'], function() {
+    gulp.src(['./components/**/*.scss'])
+        .pipe(sass().on('error', sass.logError))
+        .pipe(rename(function(path) {
+            path.extname = ".css"
+        }))
+        .pipe(gulp.dest('dist'));
+
     gulp.src(['dist/*.js', 'dist/*.css'])
         .pipe(rename(function(path) {
             path.basename = path.basename.replace(/byu-theme-components/, '2017-core-components')
